@@ -46,14 +46,12 @@ public class MapFragment extends Fragment {
 
         locationManager = (LocationManager) getActivity().getSystemService(Activity.LOCATION_SERVICE);
 
+        currentLocation = locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
+
         locationListener = new LocationListener() {
 
             @Override
             public void onLocationChanged(Location location) {
-                if (currentLocation == null) {
-                    focusRegion(location);
-                }
-
                 currentLocation = location;
             }
 

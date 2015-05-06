@@ -5,19 +5,21 @@
     android:orientation="vertical"
     tools:context="br.com.painelsocial.NewRequestActivity">
 
+    <FrameLayout
+        android:id="@+id/previewMap"
+        android:layout_width="match_parent"
+        android:layout_height="200dp"/>
+
     <ScrollView
         android:layout_width="match_parent"
-        android:layout_height="wrap_content">
+        android:layout_height="wrap_content" >
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="vertical">
-
-            <FrameLayout
-                android:id="@+id/previewMap"
-                android:layout_width="match_parent"
-                android:layout_height="200dp"/>
+            android:orientation="vertical"
+            android:paddingLeft="@dimen/activity_horizontal_margin"
+            android:paddingRight="@dimen/activity_horizontal_margin" >
 
             <TextView
                 android:id="@+id/addressInfo"
@@ -25,14 +27,15 @@
                 android:layout_height="wrap_content"
                 android:text=""
                 android:textSize="20sp"
-                android:layout_marginTop="15dp"
-                android:layout_marginLeft="@dimen/activity_horizontal_margin"/>
+                android:layout_marginTop="15dp"/>
 
             <ImageView
                 android:id="@+id/previewPicture"
                 android:layout_width="match_parent"
                 android:layout_height="200dp"
-                android:layout_marginTop="15dp"/>
+                android:layout_marginTop="15dp"
+                android:background="@color/button_material_light"
+                android:scaleType="centerCrop"/>
 
             <Button
                 android:id="@+id/takePictureButton"

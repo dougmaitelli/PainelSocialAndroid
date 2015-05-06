@@ -5,15 +5,14 @@ import android.preference.PreferenceManager;
 
 public class Config {
 
-	private static final String CFG_KEY_CUSTOMURL = "K_CUSTOMURL";
-	private static final String CFG_KEY_STEAMID = "K_STEAMID";
+	private static final String CFG_KEY_TOKEN = "K_CUSTOMURL";
 
 	SharedPreferences preferences;
 
 	private static Config singleton;
 
 	private Config() {
-		preferences = PreferenceManager.getDefaultSharedPreferences(SteamBadgeR.getInstance());
+		preferences = PreferenceManager.getDefaultSharedPreferences(PainelSocial.getInstance());
 	}
 
 	public synchronized static Config getInstance() {
@@ -31,26 +30,16 @@ public class Config {
 		this.preferences = preferences;
 	}
 
-	// configuracoes
+	// Configs
 
-    public String getCustomUrl() {
-        return getPreferences().getString(CFG_KEY_CUSTOMURL, "");
+    public String getToken() {
+        return getPreferences().getString(CFG_KEY_TOKEN, null);
     }
 
-    public boolean setCustomUrl(String customUrl) {
+    public boolean setToken(String token) {
         SharedPreferences.Editor ed = getPreferences().edit();
-        ed.putString(CFG_KEY_CUSTOMURL, customUrl);
+        ed.putString(CFG_KEY_TOKEN, token);
         return ed.commit();
     }
-
-	public String getSteamId() {
-		return getPreferences().getString(CFG_KEY_STEAMID, "");
-	}
-
-	public boolean setSteamId(String steamId) {
-		SharedPreferences.Editor ed = getPreferences().edit();
-		ed.putString(CFG_KEY_STEAMID, steamId);
-		return ed.commit();
-	}
 
 }

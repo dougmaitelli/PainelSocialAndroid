@@ -1,163 +1,44 @@
 package br.com.painelsocial;
 
-import android.content.res.Configuration;
+import android.app.Activity;
+import android.content.Intent;
 import android.os.Bundle;
-import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentTransaction;
-import android.support.v4.widget.DrawerLayout;
-import android.support.v7.app.ActionBar;
-import android.support.v7.app.ActionBarDrawerToggle;
-import android.support.v7.app.AppCompatActivity;
-import android.view.MenuItem;
 import android.view.View;
+import android.widget.Button;
 
-public class LoginActivity extends AppCompatActivity {
+public class LoginActivity extends Activity {
 
-    private DrawerLayout mDrawerLayout;
-    private ActionBarDrawerToggle mDrawerToggle;
-    private View mLeftDrawerView;
-
-    private Fragment mContent = null;
+    private Button buttonLogin;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.content_frame);
+        setContentView(R.layout.login_activity);
 
-        mDrawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
-        mLeftDrawerView = findViewById(R.id.left_drawer);
+        buttonLogin = (Button) findViewById(R.id.buttonLogin);
 
-        ActionBar actionBar = getSupportActionBar();
-        actionBar.setDisplayUseLogoEnabled(false);
-        actionBar.setHomeButtonEnabled(true);
-        actionBar.setDisplayHomeAsUpEnabled(true);
+        buttonLogin.setOnClickListener(new View.OnClickListener() {
 
-        mDrawerToggle = new ActionBarDrawerToggle(this, mDrawerLayout, R.string.menu, R.string.menu) {
-
-            public void onDrawerClosed(View drawerView) {
-                if(drawerView.equals(mLeftDrawerView)) {
-                    supportInvalidateOptionsMenu();
-                }
+            @Override
+            public void onClick(View v) {
+                login();
             }
+        });
+    }
 
-            public void onDrawerOpened(View drawerView) {
-                if(drawerView.equals(mLeftDrawerView)) {
-                    supportInvalidateOptionsMenu();
-                }
+    private void login() {
+        new LoaderTask<LoginActivity>(this, true) {
+
+            @Override
+            public void process() {
+                Config.getInstance().setToken("");
             }
 
             @Override
-            public void onDrawerSlide(View drawerView, float slideOffset) {
-                if(drawerView.equals(mLeftDrawerView)) {
-                    super.onDrawerSlide(drawerView, slideOffset);
-                }
+            public void onComplete() {
+                startActivity(new Intent(getContext(), MainActivity.class));
             }
         };
-
-        mDrawerLayout.setDrawerListener(mDrawerToggle);
-
-        if (savedInstanceState != null) {
-            mContent = getSupportFragmentManager().getFragment(savedInstanceState, "mContent");
-        }
-
-        if (mContent == null) {
-            mContent = new MapFragment();
-        }
-
-        // Menu
-        getSupportFragmentManager()
-                .beginTransaction()
-                .add(R.id.left_drawer, new MenuFragment())
-                .commit();
-
-        // Conteudo
-        getSupportFragmentManager()
-                .beginTransaction()
-                .replace(R.id.content_frame, mContent)
-                .commit();
-    }
-
-    @Override
-    protected void onPostCreate(Bundle savedInstanceState) {
-        super.onPostCreate(savedInstanceState);
-
-        mDrawerToggle.syncState();
-    }
-
-    @Override
-    public void onConfigurationChanged(Configuration newConfig) {
-        super.onConfigurationChanged(newConfig);
-
-        mDrawerToggle.onConfigurationChanged(newConfig);
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        switch (item.getItemId()) {
-            case android.R.id.home:
-                this.toogleMenu();
-                break;
-            default:
-                return super.onOptionsItemSelected(item);
-        }
-
-        return true;
-    }
-
-    public void toogleMenu() {
-        if (mDrawerLayout.isDrawerOpen(mLeftDrawerView)) {
-            mDrawerLayout.closeDrawer(mLeftDrawerView);
-        } else {
-            mDrawerLayout.openDrawer(mLeftDrawerView);
-        }
-    }
-
-    @Override
-    public void onBackPressed() {
-        if (mDrawerLayout.isDrawerOpen(mLeftDrawerView)) {
-            mDrawerLayout.closeDrawer(mLeftDrawerView);
-            return;
-        }
-
-        if (getSupportFragmentManager().popBackStackImmediate()) {
-            mContent = getSupportFragmentManager().findFragmentById(R.id.content_frame);
-            return;
-        }
-
-        this.moveTaskToBack(true);
-    }
-
-    @Override
-    public void onSaveInstanceState(Bundle outState) {
-        super.onSaveInstanceState(outState);
-
-        getSupportFragmentManager().putFragment(outState, "mContent", getSupportFragmentManager().findFragmentById(R.id.content_frame));
-    }
-
-    public void switchContent(Fragment fragment) {
-        switchContent(fragment, false);
-    }
-
-    public void switchContent(Fragment fragment, boolean dontStore) {
-        mDrawerLayout.closeDrawer(mLeftDrawerView);
-
-        Fragment currentFragment = getSupportFragmentManager().findFragmentById(R.id.content_frame);
-
-        if (currentFragment != null && currentFragment.getClass() == fragment.getClass()) {
-            return;
-        }
-
-        mContent = fragment;
-
-        FragmentTransaction tx = getSupportFragmentManager().beginTransaction();
-
-        tx.replace(R.id.content_frame, fragment);
-
-        if (!dontStore) {
-            tx.addToBackStack(null);
-        }
-
-        tx.commit();
     }
 
 }

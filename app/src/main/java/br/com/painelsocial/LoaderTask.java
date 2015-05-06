@@ -19,7 +19,7 @@ public abstract class LoaderTask<C extends Context> extends AsyncTask<C, Object,
         
         if (dialog) {
         	this.dialog = new ProgressDialog(context);
-        	this.dialog.setMessage("Loading...");
+        	this.dialog.setMessage("Carregando...");
         	this.dialog.setCancelable(false);
         	this.dialog.setOnCancelListener(new DialogInterface.OnCancelListener() {
 				
