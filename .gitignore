@@ -14,6 +14,10 @@ gen/
 
 # Gradle files
 .gradle/
+gradle/
+gradlew
+gradlew.bat
+gradle.properties
 build/
 /*/build/
 
@@ -25,3 +29,5 @@ proguard/
 
 # Log Files
 *.log
+
+.idea/
