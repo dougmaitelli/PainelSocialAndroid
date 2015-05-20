@@ -19,6 +19,10 @@ import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.MarkerOptions;
+
+import br.com.painelsocial.response.CreateRequestResponse;
+import br.com.painelsocial.ws.Ws;
 
 public class MapFragment extends Fragment {
 
@@ -85,6 +89,8 @@ public class MapFragment extends Fragment {
             if (currentLocation != null) {
                 focusRegion(currentLocation);
             }
+
+            refresh();
         }
     }
 
@@ -97,6 +103,7 @@ public class MapFragment extends Fragment {
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case R.id.menu_refresh:
+                refresh();
                 break;
             case R.id.menu_add:
                 Intent newRequest = new Intent(getActivity(), NewRequestActivity.class);
@@ -114,6 +121,33 @@ public class MapFragment extends Fragment {
         LatLng latlng = new LatLng(location.getLatitude(), location.getLongitude());
 
         mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(latlng, 13));
+    }
+
+    private void refresh() {
+        new LoaderTask<MainActivity>((MainActivity) getActivity(), true) {
+
+            CreateRequestResponse.Request[] requests = null;
+
+            @Override
+            public void process() {
+                try {
+                    requests = Ws.getAllRequests();
+                } catch (Exception ex) {
+                    ex.printStackTrace();
+                }
+            }
+
+            @Override
+            public void onComplete() {
+                if (requests != null) {
+                    for (CreateRequestResponse.Request r : requests) {
+                        if (r.getLatitude() != null && r.getLongitude() != null) {
+                            mMap.addMarker(new MarkerOptions().position(new LatLng(r.getLatitude(), r.getLongitude())));
+                        }
+                    }
+                }
+            }
+        };
     }
 
 }

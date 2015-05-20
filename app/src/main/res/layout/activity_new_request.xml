@@ -29,6 +29,16 @@
                 android:textSize="20sp"
                 android:layout_marginTop="15dp"/>
 
+            <EditText android:id="@+id/inputDescription"
+                android:inputType="textMultiLine"
+                android:lines="5"
+                android:gravity="top|left"
+                android:maxLines="10"
+                android:scrollbars="vertical"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="15dp" />
+
             <ImageView
                 android:id="@+id/previewPicture"
                 android:layout_width="match_parent"

@@ -14,6 +14,7 @@ import android.support.v4.app.FragmentManager;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -29,6 +30,8 @@ import java.io.IOException;
 import java.util.List;
 import java.util.Locale;
 
+import br.com.painelsocial.ws.Ws;
+
 
 public class NewRequestActivity extends AppCompatActivity {
 
@@ -41,8 +44,10 @@ public class NewRequestActivity extends AppCompatActivity {
     private GoogleMap mMap;
 
     private TextView addressInfo;
+    private EditText inputDescription;
     private ImageView previewPicture;
     private Button takePictureButton;
+    private Button buttonSendRequest;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -64,7 +69,7 @@ public class NewRequestActivity extends AppCompatActivity {
         }
 
         addressInfo = (TextView) findViewById(R.id.addressInfo);
-
+        inputDescription = (EditText) findViewById(R.id.inputDescription);
         previewPicture = (ImageView) findViewById(R.id.previewPicture);
 
         takePictureButton = (Button) findViewById(R.id.takePictureButton);
@@ -73,6 +78,15 @@ public class NewRequestActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 takePicture();
+            }
+        });
+
+        buttonSendRequest = (Button) findViewById(R.id.sendRequest);
+        buttonSendRequest.setOnClickListener(new View.OnClickListener() {
+
+            @Override
+            public void onClick(View v) {
+                createRequest();
             }
         });
     }
@@ -168,7 +182,7 @@ public class NewRequestActivity extends AppCompatActivity {
         int photoH = bmOptions.outHeight;
 
         // Determine how much to scale down the image
-        int scaleFactor = Math.min(photoW/targetW, photoH/targetH);
+        int scaleFactor = Math.min(photoW / targetW, photoH / targetH);
 
         // Decode the image file into a Bitmap sized to fill the View
         bmOptions.inJustDecodeBounds = false;
@@ -177,5 +191,25 @@ public class NewRequestActivity extends AppCompatActivity {
 
         Bitmap bitmap = BitmapFactory.decodeFile(mCurrentPhotoPath, bmOptions);
         previewPicture.setImageBitmap(bitmap);
+    }
+
+    private void createRequest() {
+        final String description = inputDescription.getText().toString();
+
+        new LoaderTask<NewRequestActivity>(this, true) {
+
+            @Override
+            public void process() {
+                try {
+                    Ws.createRequest(description, requestLocation.getLatitude(), requestLocation.getLongitude());
+                } catch (Exception ex) {
+                    ex.printStackTrace();
+                }
+            }
+
+            @Override
+            public void onComplete() {
+            }
+        };
     }
 }
