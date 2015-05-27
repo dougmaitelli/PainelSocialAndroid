@@ -25,7 +25,7 @@ deploy:
     secure: $GITPERM
   file:
     - "README.md"
-    - "/app/build/outputs/apk/app-debug.apk"
+    - "app/build/outputs/apk/app-debug.apk"
   on:
     tags: false
     all_branches: true
