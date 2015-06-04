@@ -2,11 +2,13 @@ package br.com.painelsocial.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
+import java.io.Serializable;
+
 /**
  * Created by I837119 on 02/06/2015.
  */
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class Request {
+public class Request implements Serializable {
 
     private String _id;
     private Double latitude;

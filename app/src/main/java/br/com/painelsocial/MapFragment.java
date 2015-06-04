@@ -144,13 +144,23 @@ public class MapFragment extends Fragment {
         return true;
     }
 
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        if (resultCode == Activity.RESULT_OK) {
+            if (requestCode == REQUEST_NEW_REQUEST) {
+                Request request = (Request) data.getExtras().get(NewRequestActivity.RESULT_REQUEST);
+                addToMap(request);
+            }
+        }
+    }
+
     private void focusRegion(Location location) {
         LatLng latlng = new LatLng(location.getLatitude(), location.getLongitude());
 
         mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(latlng, 13));
     }
 
-    private void refresh() {
+    public void refresh() {
         new LoaderTask<MainActivity>((MainActivity) getActivity(), true) {
 
             Request[] requests = null;
@@ -167,18 +177,24 @@ public class MapFragment extends Fragment {
             @Override
             public void onComplete() {
                 if (requests != null) {
+                    mMap.clear();
+
                     requestMarkers = new HashMap<>();
 
                     for (Request r : requests) {
-                        if (r.getLatitude() != null && r.getLongitude() != null) {
-                            Marker marker = mMap.addMarker(new MarkerOptions().position(new LatLng(r.getLatitude(), r.getLongitude())).snippet(r.get_id()));
-
-                            requestMarkers.put(marker.getId(), r);
-                        }
+                        addToMap(r);
                     }
                 }
             }
         };
+    }
+
+    public void addToMap(Request request) {
+        if (request.getLatitude() != null && request.getLongitude() != null) {
+            Marker marker = mMap.addMarker(new MarkerOptions().position(new LatLng(request.getLatitude(), request.getLongitude())));
+
+            requestMarkers.put(marker.getId(), request);
+        }
     }
 
 }

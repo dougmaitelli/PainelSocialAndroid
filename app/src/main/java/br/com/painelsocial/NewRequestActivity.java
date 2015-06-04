@@ -33,6 +33,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 
+import br.com.painelsocial.model.Request;
 import br.com.painelsocial.ws.Ws;
 
 
@@ -41,6 +42,7 @@ public class NewRequestActivity extends AppCompatActivity {
     public static final String LOCATION_EXTRA = "location";
     private static final int REQUEST_IMAGE_CAPTURE = 1;
     private static final int REQUEST_SELECT_IMAGE = 2;
+    public static final String RESULT_REQUEST = "request";
 
     private LatLng requestLocation = null;
 
@@ -260,10 +262,12 @@ public class NewRequestActivity extends AppCompatActivity {
 
         new LoaderTask<NewRequestActivity>(this, true) {
 
+            private Request request;
+
             @Override
             public void process() {
                 try {
-                    Ws.createRequest(description, requestLocation.latitude, requestLocation.longitude, images);
+                    request = Ws.createRequest(description, requestLocation.latitude, requestLocation.longitude, images);
                 } catch (Exception ex) {
                     ex.printStackTrace();
                 }
@@ -271,6 +275,12 @@ public class NewRequestActivity extends AppCompatActivity {
 
             @Override
             public void onComplete() {
+                Bundle data = new Bundle();
+                data.putSerializable(RESULT_REQUEST, request);
+                Intent intent = new Intent();
+                intent.putExtras(data);
+                setResult(RESULT_OK, intent);
+                finish();
             }
         };
     }
