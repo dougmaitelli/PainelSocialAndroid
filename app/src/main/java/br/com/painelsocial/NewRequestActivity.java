@@ -131,14 +131,9 @@ public class NewRequestActivity extends AppCompatActivity {
                 addPicture(bitmap);
             } else if (requestCode == REQUEST_SELECT_IMAGE) {
                 Uri selectedImageUri = data.getData();
-                try {
-                    InputStream imageStream = getContentResolver().openInputStream(selectedImageUri);
-                    Bitmap bitmap = getPicture(imageStream);
+                Bitmap bitmap = getPicture(selectedImageUri);
 
-                    addPicture(bitmap);
-                } catch (FileNotFoundException ex) {
-                    ex.printStackTrace();
-                }
+                addPicture(bitmap);
             }
         }
     }
@@ -212,29 +207,35 @@ public class NewRequestActivity extends AppCompatActivity {
         // Get the dimensions of the View
         int targetH = previewPictures.getHeight();
 
-        // Get the dimensions of the bitmap
-        BitmapFactory.Options bmOptions = new BitmapFactory.Options();
-        bmOptions.inJustDecodeBounds = true;
-        if (photoPath instanceof String) {
-            BitmapFactory.decodeFile((String) photoPath, bmOptions);
-        } else if (photoPath instanceof InputStream) {
-            BitmapFactory.decodeStream((InputStream) photoPath, null, bmOptions);
-        }
-        int photoH = bmOptions.outHeight;
-
-        // Determine how much to scale down the image
-        int scaleFactor = photoH / targetH;
-
-        // Decode the image file into a Bitmap sized to fill the View
-        bmOptions.inJustDecodeBounds = false;
-        bmOptions.inSampleSize = scaleFactor;
-        bmOptions.inPurgeable = true;
-
         Bitmap bitmap = null;
-        if (photoPath instanceof String) {
-            bitmap = BitmapFactory.decodeFile((String) photoPath, bmOptions);
-        } else if (photoPath instanceof InputStream) {
-            bitmap = BitmapFactory.decodeStream((InputStream) photoPath, null, bmOptions);
+        try {
+            // Get the dimensions of the bitmap
+            BitmapFactory.Options bmOptions = new BitmapFactory.Options();
+            bmOptions.inJustDecodeBounds = true;
+            if (photoPath instanceof String) {
+                BitmapFactory.decodeFile((String) photoPath, bmOptions);
+            } else if (photoPath instanceof Uri) {
+                InputStream imageStream = getContentResolver().openInputStream((Uri) photoPath);
+                BitmapFactory.decodeStream(imageStream, null, bmOptions);
+            }
+            int photoH = bmOptions.outHeight;
+
+            // Determine how much to scale down the image
+            int scaleFactor = photoH / targetH;
+
+            // Decode the image file into a Bitmap sized to fill the View
+            bmOptions.inJustDecodeBounds = false;
+            bmOptions.inSampleSize = scaleFactor;
+            bmOptions.inPurgeable = true;
+
+            if (photoPath instanceof String) {
+                bitmap = BitmapFactory.decodeFile((String) photoPath, bmOptions);
+            } else if (photoPath instanceof Uri) {
+                    InputStream imageStream = getContentResolver().openInputStream((Uri) photoPath);
+                    bitmap = BitmapFactory.decodeStream(imageStream, null, bmOptions);
+            }
+        } catch (FileNotFoundException ex) {
+            ex.printStackTrace();
         }
 
         return bitmap;
