@@ -5,7 +5,6 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
-import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import java.util.ArrayList;
@@ -58,16 +57,16 @@ public class MenuAdapter extends BaseAdapter {
     public View getView(int position, View convertView, ViewGroup parent) {
     	AppMenu item = adapter.get(position);
 
-        LinearLayout view = (LinearLayout) convertView;
+        View view = convertView;
 
         if (view == null) {
             LayoutInflater inflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-            view = (LinearLayout) inflater.inflate(R.layout.menu_item, null);
+            view = inflater.inflate(android.R.layout.simple_list_item_1, null);
         }
 
         view.setTag(item.name());
 
-        TextView text = (TextView) view.findViewById(R.id.menu_text);
+        TextView text = (TextView) view.findViewById(android.R.id.text1);
         text.setText(item.getText());
             
         return view;

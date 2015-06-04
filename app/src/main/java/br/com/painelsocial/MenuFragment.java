@@ -35,20 +35,13 @@ public class MenuFragment extends Fragment {
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 AppMenu menu = (AppMenu) parent.getItemAtPosition(position);
 
-                switchFragment(menu.getTela());
-            }
-        });
-
-        listView.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
-            @Override
-            public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
-                AppMenu menu = (AppMenu) parent.getItemAtPosition(position);
-
-                if (menu == AppMenu.SAIR) {
-                    return false;
+                switch (menu) {
+                    case SAIR:
+                        ((MainActivity) getActivity()).loginActivity();
+                        break;
+                    default:
+                        switchFragment(menu.getTela());
                 }
-
-                return true;
             }
         });
 	}

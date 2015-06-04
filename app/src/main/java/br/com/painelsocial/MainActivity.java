@@ -9,7 +9,6 @@ import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.Toolbar;
 import android.view.MenuItem;
 import android.view.View;
 
@@ -27,10 +26,7 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.content_frame);
 
         if (Config.getInstance().getToken() == null) {
-            Intent intent = new Intent(this, LoginActivity.class);
-            startActivity(intent);
-
-            finish();
+            loginActivity();
             return;
         }
 
@@ -142,6 +138,13 @@ public class MainActivity extends AppCompatActivity {
         super.onSaveInstanceState(outState);
 
         getSupportFragmentManager().putFragment(outState, "mContent", getSupportFragmentManager().findFragmentById(R.id.content_frame));
+    }
+
+    public void loginActivity() {
+        Intent intent = new Intent(this, LoginActivity.class);
+        startActivity(intent);
+
+        finish();
     }
 
     public void switchContent(Fragment fragment) {
