@@ -66,6 +66,10 @@
             android:name=".NewRequestActivity"
             android:label="@string/title_activity_new_request" >
         </activity>
+        <activity
+            android:name=".ViewRequestActivity"
+            android:label="@string/title_activity_view_request" >
+        </activity>
     </application>
 
 </manifest>

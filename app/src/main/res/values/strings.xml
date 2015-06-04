@@ -6,9 +6,12 @@
     <string name="action_refresh">Atualizar</string>
     <string name="action_add">Adicionar</string>
 
-    <string name="title_activity_new_request">Nova Solicitação</string>
+    <string name="title_activity_new_request">Nova Reclamação</string>
     <string name="take_picture">Tirar Foto</string>
+    <string name="select_picture">Selecionar Foto</string>
     <string name="send_request">Enviar</string>
+
+    <string name="title_activity_view_request">Ver Reclamação</string>
 
     <string name="title_activity_login">Login</string>
     <string name="prompt_email">Email</string>
@@ -21,7 +24,6 @@
 
     <string name="google_maps_key">AIzaSyAzE-mW-aUkvIjFp5tEV13xKuLb5fYfwfk</string>
 
-    <string name="hello_world">Hello world!</string>
     <string name="action_settings">Settings</string>
 
 </resources>

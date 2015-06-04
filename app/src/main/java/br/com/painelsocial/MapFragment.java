@@ -19,14 +19,18 @@ import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 
-import br.com.painelsocial.response.CreateRequestResponse;
+import java.util.HashMap;
+
+import br.com.painelsocial.model.Request;
 import br.com.painelsocial.ws.Ws;
 
 public class MapFragment extends Fragment {
 
     private static final int REQUEST_NEW_REQUEST = 1;
+    private static final int REQUEST_VIEW_REQUEST = 2;
 
     private LocationManager locationManager;
     private LocationListener locationListener;
@@ -34,6 +38,7 @@ public class MapFragment extends Fragment {
 
     private SupportMapFragment mapFragment;
     private GoogleMap mMap;
+    private HashMap<String, Request> requestMarkers;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -86,6 +91,28 @@ public class MapFragment extends Fragment {
         if (mMap == null) {
             mMap = mapFragment.getMap();
 
+            mMap.setOnMapClickListener(new GoogleMap.OnMapClickListener() {
+                @Override
+                public void onMapClick(LatLng latLng) {
+                    Intent newRequest = new Intent(getActivity(), NewRequestActivity.class);
+                    newRequest.putExtra(NewRequestActivity.LOCATION_EXTRA, latLng);
+                    startActivityForResult(newRequest, REQUEST_NEW_REQUEST);
+                }
+            });
+
+            mMap.setOnMarkerClickListener(new GoogleMap.OnMarkerClickListener() {
+                @Override
+                public boolean onMarkerClick(Marker marker) {
+                    Request r = requestMarkers.get(marker.getId());
+
+                    Intent viewRequest = new Intent(getActivity(), ViewRequestActivity.class);
+                    viewRequest.putExtra(ViewRequestActivity.REQUEST_EXTRA, r.get_id());
+                    startActivityForResult(viewRequest, REQUEST_VIEW_REQUEST);
+
+                    return true;
+                }
+            });
+
             if (currentLocation != null) {
                 focusRegion(currentLocation);
             }
@@ -107,7 +134,7 @@ public class MapFragment extends Fragment {
                 break;
             case R.id.menu_add:
                 Intent newRequest = new Intent(getActivity(), NewRequestActivity.class);
-                newRequest.putExtra(NewRequestActivity.LOCATION_EXTRA, currentLocation);
+                newRequest.putExtra(NewRequestActivity.LOCATION_EXTRA, new LatLng(currentLocation.getLatitude(), currentLocation.getLongitude()));
                 startActivityForResult(newRequest, REQUEST_NEW_REQUEST);
                 break;
             default:
@@ -126,7 +153,7 @@ public class MapFragment extends Fragment {
     private void refresh() {
         new LoaderTask<MainActivity>((MainActivity) getActivity(), true) {
 
-            CreateRequestResponse.Request[] requests = null;
+            Request[] requests = null;
 
             @Override
             public void process() {
@@ -140,9 +167,13 @@ public class MapFragment extends Fragment {
             @Override
             public void onComplete() {
                 if (requests != null) {
-                    for (CreateRequestResponse.Request r : requests) {
+                    requestMarkers = new HashMap<>();
+
+                    for (Request r : requests) {
                         if (r.getLatitude() != null && r.getLongitude() != null) {
-                            mMap.addMarker(new MarkerOptions().position(new LatLng(r.getLatitude(), r.getLongitude())));
+                            Marker marker = mMap.addMarker(new MarkerOptions().position(new LatLng(r.getLatitude(), r.getLongitude())).snippet(r.get_id()));
+
+                            requestMarkers.put(marker.getId(), r);
                         }
                     }
                 }
