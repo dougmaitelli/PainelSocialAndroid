@@ -85,7 +85,7 @@ public class Ws {
 
         ResponseWrapper<Request> object = sendRequest(HttpMethod.POST, "demands", obj, new ParameterizedTypeReference<ResponseWrapper<Request>>() {});
 
-        return object.getDemand();
+        return object.getData();
     }
 
     private static <E> E sendRequest(HttpMethod requestMethod, String method, Object requestObject, Class<E> returnClass) throws Exception {

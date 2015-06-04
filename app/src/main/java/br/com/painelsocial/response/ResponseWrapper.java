@@ -18,13 +18,4 @@ public class ResponseWrapper<E> {
         this.data = data;
     }
 
-    private E demand;
-
-    public E getDemand() {
-        return demand;
-    }
-
-    public void setDemand(E demand) {
-        this.demand = demand;
-    }
 }
