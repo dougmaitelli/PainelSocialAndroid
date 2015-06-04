@@ -1,0 +1,35 @@
+language: android
+
+android:
+  components:
+    - build-tools-22.0.1
+    - android-22
+    - extra
+
+before_script:
+- export GIT_TAG=$TRAVIS_BRANCH-1.0.$TRAVIS_BUILD_NUMBER
+
+script: gradle build
+
+before_deploy:
+  - git config --global user.email "builds@travis-ci.com"
+  - git config --global user.name "Travis CI"
+  - git tag $GIT_TAG -a -m "Generated tag from TravisCI for build $TRAVIS_BUILD_NUMBER"
+  - git push -q https://$GITPERM@github.com/dougmaitelli/PainelSocialAndroid --tags
+  - ls -R
+
+deploy:
+  skip_cleanup: true
+  provider: releases
+  api_key:
+    secure: $GITPERM
+  file:
+    - "README.md"
+    - "app/build/outputs/apk/app-debug.apk"
+  on:
+    tags: false
+    all_branches: true
+
+branches:
+  except:
+    - /^*-[0-9]/
