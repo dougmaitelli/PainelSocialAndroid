@@ -39,21 +39,43 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="15dp" />
 
-            <ImageView
-                android:id="@+id/previewPicture"
-                android:layout_width="match_parent"
-                android:layout_height="200dp"
+            <HorizontalScrollView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
                 android:layout_marginTop="15dp"
-                android:background="@color/button_material_light"
-                android:scaleType="centerCrop"/>
+                android:background="@color/button_material_light">
 
-            <Button
-                android:id="@+id/takePictureButton"
+                <LinearLayout
+                    android:id="@+id/previewPictures"
+                    android:layout_width="wrap_content"
+                    android:layout_height="200dp"
+                    android:orientation="horizontal"/>
+
+            </HorizontalScrollView>
+
+            <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="@string/take_picture"
+                android:orientation="horizontal"
+                android:weightSum="1"
                 android:layout_marginLeft="@dimen/activity_horizontal_margin"
-                android:layout_marginRight="@dimen/activity_horizontal_margin"/>
+                android:layout_marginRight="@dimen/activity_horizontal_margin">
+
+                <Button
+                    android:id="@+id/takePictureButton"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="0.5"
+                    android:text="@string/take_picture"/>
+
+                <Button
+                    android:id="@+id/selectPictureButton"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="0.5"
+                    android:text="@string/select_picture"/>
+
+            </LinearLayout>
 
             <Button
                 android:id="@+id/sendRequest"

@@ -5,7 +5,6 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.location.Address;
 import android.location.Geocoder;
-import android.location.Location;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
@@ -16,6 +15,7 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.google.android.gms.maps.CameraUpdateFactory;
@@ -26,7 +26,10 @@ import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
 
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.io.InputStream;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 
@@ -37,16 +40,19 @@ public class NewRequestActivity extends AppCompatActivity {
 
     public static final String LOCATION_EXTRA = "location";
     private static final int REQUEST_IMAGE_CAPTURE = 1;
+    private static final int REQUEST_SELECT_IMAGE = 2;
 
-    private Location requestLocation = null;
+    private LatLng requestLocation = null;
 
     private SupportMapFragment mapFragment;
     private GoogleMap mMap;
 
     private TextView addressInfo;
     private EditText inputDescription;
-    private ImageView previewPicture;
+    private List<Bitmap> images;
+    private LinearLayout previewPictures;
     private Button takePictureButton;
+    private Button selectPictureButton;
     private Button buttonSendRequest;
 
     @Override
@@ -54,7 +60,9 @@ public class NewRequestActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_new_request);
 
-        requestLocation = (Location) getIntent().getExtras().get(LOCATION_EXTRA);
+        Bundle bundle = getIntent().getExtras();
+
+        requestLocation = (LatLng) bundle.get(LOCATION_EXTRA);
 
         FragmentManager fm = getSupportFragmentManager();
         mapFragment = (SupportMapFragment) fm.findFragmentById(R.id.previewMap);
@@ -70,7 +78,8 @@ public class NewRequestActivity extends AppCompatActivity {
 
         addressInfo = (TextView) findViewById(R.id.addressInfo);
         inputDescription = (EditText) findViewById(R.id.inputDescription);
-        previewPicture = (ImageView) findViewById(R.id.previewPicture);
+        images = new ArrayList<>();
+        previewPictures = (LinearLayout) findViewById(R.id.previewPictures);
 
         takePictureButton = (Button) findViewById(R.id.takePictureButton);
         takePictureButton.setOnClickListener(new View.OnClickListener() {
@@ -78,6 +87,15 @@ public class NewRequestActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 takePicture();
+            }
+        });
+
+        selectPictureButton = (Button) findViewById(R.id.selectPictureButton);
+        selectPictureButton.setOnClickListener(new View.OnClickListener() {
+
+            @Override
+            public void onClick(View v) {
+                selectPicture();
             }
         });
 
@@ -106,14 +124,26 @@ public class NewRequestActivity extends AppCompatActivity {
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        if (requestCode == REQUEST_IMAGE_CAPTURE && resultCode == RESULT_OK) {
-            setPic();
+        if (resultCode == RESULT_OK) {
+            if (requestCode == REQUEST_IMAGE_CAPTURE) {
+                Bitmap bitmap = getPicture(mCurrentPhotoPath);
+
+                addPicture(bitmap);
+            } else if (requestCode == REQUEST_SELECT_IMAGE) {
+                Uri selectedImageUri = data.getData();
+                try {
+                    InputStream imageStream = getContentResolver().openInputStream(selectedImageUri);
+                    Bitmap bitmap = getPicture(imageStream);
+
+                    addPicture(bitmap);
+                } catch (FileNotFoundException ex) {
+                    ex.printStackTrace();
+                }
+            }
         }
     }
 
-    private void updateMapLocation(Location location) {
-        LatLng latlng = new LatLng(location.getLatitude(), location.getLongitude());
-
+    private void updateMapLocation(LatLng latlng) {
         mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(latlng, 15));
         mMap.addMarker(new MarkerOptions().position(latlng));
 
@@ -121,7 +151,7 @@ public class NewRequestActivity extends AppCompatActivity {
         Geocoder gcd = new Geocoder(getBaseContext(), Locale.getDefault());
         List<Address> addresses;
         try {
-            addresses = gcd.getFromLocation(location.getLatitude(), location.getLongitude(), 1);
+            addresses = gcd.getFromLocation(latlng.latitude, latlng.longitude, 1);
             if (addresses.size() > 0) {
                 addressText = addresses.get(0).getSubAdminArea();
             }
@@ -138,7 +168,7 @@ public class NewRequestActivity extends AppCompatActivity {
         if (takePictureIntent.resolveActivity(getPackageManager()) != null) {
             File photoFile = null;
             try {
-                photoFile = createImageFile();
+                photoFile = createTempImageFile();
             } catch (IOException ex) {
                 // Error occurred while creating the File
             }
@@ -150,9 +180,18 @@ public class NewRequestActivity extends AppCompatActivity {
         }
     }
 
+    private void selectPicture() {
+        Intent photoPickerIntent = new Intent(Intent.ACTION_PICK);
+        photoPickerIntent.setType("image/*");
+        startActivityForResult(photoPickerIntent, REQUEST_SELECT_IMAGE);
+    }
+
+    //----------------------------------------------------------------------------------------------
+    // Image Methods
+    //----------------------------------------------------------------------------------------------
     private String mCurrentPhotoPath;
 
-    private File createImageFile() throws IOException {
+    private File createTempImageFile() throws IOException {
         File storageDir = Environment.getExternalStorageDirectory();
         storageDir = new File(storageDir.getAbsolutePath() + "/.temp/");
 
@@ -169,28 +208,50 @@ public class NewRequestActivity extends AppCompatActivity {
         return image;
     }
 
-    private void setPic() {
+    private Bitmap getPicture(Object photoPath) {
         // Get the dimensions of the View
-        int targetW = previewPicture.getWidth();
-        int targetH = previewPicture.getHeight();
+        int targetH = previewPictures.getHeight();
 
         // Get the dimensions of the bitmap
         BitmapFactory.Options bmOptions = new BitmapFactory.Options();
         bmOptions.inJustDecodeBounds = true;
-        BitmapFactory.decodeFile(mCurrentPhotoPath, bmOptions);
-        int photoW = bmOptions.outWidth;
+        if (photoPath instanceof String) {
+            BitmapFactory.decodeFile((String) photoPath, bmOptions);
+        } else if (photoPath instanceof InputStream) {
+            BitmapFactory.decodeStream((InputStream) photoPath, null, bmOptions);
+        }
         int photoH = bmOptions.outHeight;
 
         // Determine how much to scale down the image
-        int scaleFactor = Math.min(photoW / targetW, photoH / targetH);
+        int scaleFactor = photoH / targetH;
 
         // Decode the image file into a Bitmap sized to fill the View
         bmOptions.inJustDecodeBounds = false;
         bmOptions.inSampleSize = scaleFactor;
         bmOptions.inPurgeable = true;
 
-        Bitmap bitmap = BitmapFactory.decodeFile(mCurrentPhotoPath, bmOptions);
+        Bitmap bitmap = null;
+        if (photoPath instanceof String) {
+            bitmap = BitmapFactory.decodeFile((String) photoPath, bmOptions);
+        } else if (photoPath instanceof InputStream) {
+            bitmap = BitmapFactory.decodeStream((InputStream) photoPath, null, bmOptions);
+        }
+
+        return bitmap;
+    }
+    //----------------------------------------------------------------------------------------------
+
+    private void addPicture(Bitmap bitmap) {
+        images.add(bitmap);
+
+        ImageView previewPicture = new ImageView(this);
+        previewPicture.setLayoutParams(new LinearLayout.LayoutParams(
+                LinearLayout.LayoutParams.MATCH_PARENT,
+                LinearLayout.LayoutParams.WRAP_CONTENT));
         previewPicture.setImageBitmap(bitmap);
+        previewPicture.setAdjustViewBounds(true);
+
+        previewPictures.addView(previewPicture);
     }
 
     private void createRequest() {
@@ -201,7 +262,7 @@ public class NewRequestActivity extends AppCompatActivity {
             @Override
             public void process() {
                 try {
-                    Ws.createRequest(description, requestLocation.getLatitude(), requestLocation.getLongitude());
+                    Ws.createRequest(description, requestLocation.latitude, requestLocation.longitude, images);
                 } catch (Exception ex) {
                     ex.printStackTrace();
                 }
@@ -212,4 +273,5 @@ public class NewRequestActivity extends AppCompatActivity {
             }
         };
     }
+
 }
