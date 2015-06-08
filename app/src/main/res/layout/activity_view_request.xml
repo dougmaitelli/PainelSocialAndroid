@@ -53,6 +53,35 @@
 
             </ScrollView>
 
+            <LinearLayout
+                android:id="@+id/comments"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"/>
+
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="1dip"
+                android:layout_margin="3dp"
+                android:background="#FF666666"/>
+
+            <EditText android:id="@+id/inputComment"
+                android:inputType="textMultiLine"
+                android:lines="5"
+                android:gravity="top|left"
+                android:maxLines="10"
+                android:scrollbars="vertical"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="15dp" />
+
+            <Button
+                android:id="@+id/sendComment"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/send_request"
+                android:layout_marginTop="15dp"/>
+
         </LinearLayout>
 
     </ScrollView>

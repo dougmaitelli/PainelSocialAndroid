@@ -8,6 +8,9 @@ import android.os.Bundle;
 import android.support.v4.app.FragmentManager;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Base64;
+import android.view.View;
+import android.widget.Button;
+import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
@@ -24,6 +27,7 @@ import java.util.List;
 import java.util.Locale;
 
 import br.com.painelsocial.model.Request;
+import br.com.painelsocial.view.CommentView;
 import br.com.painelsocial.ws.Ws;
 
 
@@ -40,6 +44,10 @@ public class ViewRequestActivity extends AppCompatActivity {
     private TextView addressInfo;
     private TextView textDescription;
     private LinearLayout previewPictures;
+
+    private LinearLayout comments;
+    private EditText inputComment;
+    private Button sendComment;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -66,6 +74,19 @@ public class ViewRequestActivity extends AppCompatActivity {
         addressInfo = (TextView) findViewById(R.id.addressInfo);
         textDescription = (TextView) findViewById(R.id.textDescription);
         previewPictures = (LinearLayout) findViewById(R.id.previewPictures);
+
+        comments = (LinearLayout) findViewById(R.id.comments);
+        inputComment = (EditText) findViewById(R.id.inputComment);
+        sendComment = (Button) findViewById(R.id.sendComment);
+
+        sendComment.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                String commentText = inputComment.getText().toString();
+                inputComment.clearComposingText();
+                addComment(commentText);
+            }
+        });
     }
 
     @Override
@@ -98,6 +119,12 @@ public class ViewRequestActivity extends AppCompatActivity {
         }
 
         addressInfo.setText(addressText);
+    }
+
+    private void addComment(String commentText) {
+        CommentView commentView = new CommentView(this, commentText);
+
+        comments.addView(commentView);
     }
 
     private void loadRequest(final String _id) {
