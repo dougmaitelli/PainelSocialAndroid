@@ -4,6 +4,7 @@ import android.support.v4.app.Fragment;
 
 public enum AppMenu {
 
+	CONTATO("Contato", null),
 	SAIR("Sair", null);
 	
 	private String text;

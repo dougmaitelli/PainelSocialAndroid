@@ -140,6 +140,11 @@ public class MainActivity extends AppCompatActivity {
         getSupportFragmentManager().putFragment(outState, "mContent", getSupportFragmentManager().findFragmentById(R.id.content_frame));
     }
 
+    public void logoff() {
+        Config.getInstance().setToken(null);
+        loginActivity();
+    }
+
     public void loginActivity() {
         Intent intent = new Intent(this, LoginActivity.class);
         startActivity(intent);
