@@ -29,6 +29,36 @@
                 android:textSize="20sp"
                 android:layout_marginTop="15dp"/>
 
+            <RelativeLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content" >
+
+                <LinearLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentRight="true"
+                    android:orientation="horizontal">
+
+                    <Button
+                        android:id="@+id/minusButton"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:textSize="28sp"
+                        android:textColor="#FFCC0000"
+                        android:text="-"/>
+
+                    <Button
+                        android:id="@+id/plusButton"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:textSize="28sp"
+                        android:textColor="#FF00CC00"
+                        android:text="+"/>
+
+                </LinearLayout>
+
+            </RelativeLayout>
+
             <TextView android:id="@+id/textDescription"
                 android:inputType="textMultiLine"
                 android:lines="5"

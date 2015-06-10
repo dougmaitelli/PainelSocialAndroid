@@ -19,6 +19,7 @@ import java.util.Collections;
 import java.util.List;
 
 import br.com.painelsocial.Config;
+import br.com.painelsocial.model.Comment;
 import br.com.painelsocial.model.Request;
 import br.com.painelsocial.request.LoginRequest;
 import br.com.painelsocial.request.RegisterRequest;
@@ -56,34 +57,52 @@ public class Ws {
         return object.getData();
     }
 
-    public static Request loadRequest(String _id) throws Exception {
-        ResponseWrapper<Request> object = sendRequest(HttpMethod.GET, "demands/" + _id, null, new ParameterizedTypeReference<ResponseWrapper<Request>>() {});
-
-        return object.getData();
-    }
-
     public static Request createRequest(String description, double lat, double lng, List<Bitmap> images) throws Exception {
         Request obj = new Request();
         obj.setDescription(description);
         obj.setLatitude(lat);
         obj.setLongitude(lng);
 
-        List<Request.RequestImage> requestImages = new ArrayList<>();
+        List<String> requestImages = new ArrayList<>();
         for (Bitmap image : images) {
-            Request.RequestImage requestImage = new Request.RequestImage();
-
             ByteArrayOutputStream baos = new ByteArrayOutputStream();
             image.compress(Bitmap.CompressFormat.JPEG, 80, baos);
             byte[] b = baos.toByteArray();
             String imageEncoded = Base64.encodeToString(b, Base64.DEFAULT);
 
-            requestImage.setImage(imageEncoded);
-            requestImages.add(requestImage);
+            requestImages.add(imageEncoded);
         }
 
-        obj.setImages(requestImages.toArray(new Request.RequestImage[]{}));
+        obj.setImages(requestImages.toArray(new String[]{}));
 
         ResponseWrapper<Request> object = sendRequest(HttpMethod.POST, "demands", obj, new ParameterizedTypeReference<ResponseWrapper<Request>>() {});
+
+        return object.getData();
+    }
+
+    public static Request loadRequest(String _id) throws Exception {
+        ResponseWrapper<Request> object = sendRequest(HttpMethod.GET, "demands/" + _id, null, new ParameterizedTypeReference<ResponseWrapper<Request>>() {});
+
+        return object.getData();
+    }
+
+    public static Request plusRequest(String _id) throws Exception {
+        ResponseWrapper<Request> object = sendRequest(HttpMethod.POST, "demands/" + _id + "/plus", null, new ParameterizedTypeReference<ResponseWrapper<Request>>() {});
+
+        return object.getData();
+    }
+
+    public static Request minusRequest(String _id) throws Exception {
+        ResponseWrapper<Request> object = sendRequest(HttpMethod.POST, "demands/" + _id + "/minus", null, new ParameterizedTypeReference<ResponseWrapper<Request>>() {});
+
+        return object.getData();
+    }
+
+    public static Comment commentRequest(String _id, String commentText) throws Exception {
+        Comment comment = new Comment();
+        comment.setDescription(commentText);
+
+        ResponseWrapper<Comment> object = sendRequest(HttpMethod.POST, "demands/" + _id + "/comment", comment, new ParameterizedTypeReference<ResponseWrapper<Comment>>() {});
 
         return object.getData();
     }

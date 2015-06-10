@@ -26,6 +26,7 @@ import java.io.IOException;
 import java.util.List;
 import java.util.Locale;
 
+import br.com.painelsocial.model.Comment;
 import br.com.painelsocial.model.Request;
 import br.com.painelsocial.view.CommentView;
 import br.com.painelsocial.ws.Ws;
@@ -42,6 +43,8 @@ public class ViewRequestActivity extends AppCompatActivity {
     private GoogleMap mMap;
 
     private TextView addressInfo;
+    private Button minusButton;
+    private Button plusButton;
     private TextView textDescription;
     private LinearLayout previewPictures;
 
@@ -72,6 +75,8 @@ public class ViewRequestActivity extends AppCompatActivity {
         }
 
         addressInfo = (TextView) findViewById(R.id.addressInfo);
+        minusButton = (Button) findViewById(R.id.minusButton);
+        plusButton = (Button) findViewById(R.id.plusButton);
         textDescription = (TextView) findViewById(R.id.textDescription);
         previewPictures = (LinearLayout) findViewById(R.id.previewPictures);
 
@@ -79,12 +84,26 @@ public class ViewRequestActivity extends AppCompatActivity {
         inputComment = (EditText) findViewById(R.id.inputComment);
         sendComment = (Button) findViewById(R.id.sendComment);
 
+        minusButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                minus();
+            }
+        });
+
+        plusButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                plus();
+            }
+        });
+
         sendComment.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 String commentText = inputComment.getText().toString();
-                inputComment.clearComposingText();
-                addComment(commentText);
+                inputComment.setText("");
+                postComment(commentText);
             }
         });
     }
@@ -121,8 +140,67 @@ public class ViewRequestActivity extends AppCompatActivity {
         addressInfo.setText(addressText);
     }
 
-    private void addComment(String commentText) {
-        CommentView commentView = new CommentView(this, commentText);
+    public void minus() {
+        new LoaderTask<ViewRequestActivity>(this, true) {
+
+            @Override
+            public void process() {
+                try {
+                    Ws.minusRequest(request.get_id());
+                } catch (Exception ex) {
+                    ex.printStackTrace();
+                }
+            }
+
+            @Override
+            public void onComplete() {
+            }
+        };
+    }
+
+    public void plus() {
+        new LoaderTask<ViewRequestActivity>(this, true) {
+
+            @Override
+            public void process() {
+                try {
+                    Ws.plusRequest(request.get_id());
+                } catch (Exception ex) {
+                    ex.printStackTrace();
+                }
+            }
+
+            @Override
+            public void onComplete() {
+            }
+        };
+    }
+
+    public void postComment(final String commentText) {
+        new LoaderTask<ViewRequestActivity>(this, true) {
+
+            private Comment comment;
+
+            @Override
+            public void process() {
+                try {
+                    comment = Ws.commentRequest(request.get_id(), commentText);
+                } catch (Exception ex) {
+                    ex.printStackTrace();
+                }
+            }
+
+            @Override
+            public void onComplete() {
+                if (comment != null) {
+                    addComment(comment);
+                }
+            }
+        };
+    }
+
+    public void addComment(Comment comment) {
+        CommentView commentView = new CommentView(this, comment);
 
         comments.addView(commentView);
     }
@@ -146,8 +224,12 @@ public class ViewRequestActivity extends AppCompatActivity {
 
                     textDescription.setText(request.getDescription());
 
-                    for (Request.RequestImage image : request.getImages()) {
-                        byte[] decodedString = Base64.decode(image.getImage(), Base64.DEFAULT);
+                    for (String image : request.getImages()) {
+                        if (image == null) {
+                            continue;
+                        }
+
+                        byte[] decodedString = Base64.decode(image, Base64.DEFAULT);
                         Bitmap bitmap = BitmapFactory.decodeByteArray(decodedString, 0, decodedString.length);
 
                         ImageView previewPicture = new ImageView(getContext());
@@ -158,6 +240,14 @@ public class ViewRequestActivity extends AppCompatActivity {
                         previewPicture.setAdjustViewBounds(true);
 
                         previewPictures.addView(previewPicture);
+                    }
+
+                    for (Comment comment : request.getComments()) {
+                        if (comment == null) {
+                            continue;
+                        }
+
+                        addComment(comment);
                     }
 
                     updateMapLocation(requestLocation);

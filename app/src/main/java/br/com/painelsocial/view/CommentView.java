@@ -6,10 +6,11 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import br.com.painelsocial.R;
+import br.com.painelsocial.model.Comment;
 
 public class CommentView extends LinearLayout {
 
-    private String comment;
+    private Comment comment;
 
     private TextView commentText;
 
@@ -19,7 +20,7 @@ public class CommentView extends LinearLayout {
         build();
     }
 
-    public CommentView(Context context, String comment) {
+    public CommentView(Context context, Comment comment) {
         super(context);
         this.comment = comment;
 
@@ -30,7 +31,7 @@ public class CommentView extends LinearLayout {
         super(context, attrs);
     }
 
-    public void setComment(String comment) {
+    public void setComment(Comment comment) {
         this.comment = comment;
     }
 
@@ -43,6 +44,6 @@ public class CommentView extends LinearLayout {
     }
 
     public void refreshBadgeData() {
-        commentText.setText(comment);
+        commentText.setText(comment.getDescription());
     }
 }
