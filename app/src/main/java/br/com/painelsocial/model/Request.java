@@ -14,6 +14,9 @@ public class Request implements Serializable {
     private Double latitude;
     private Double longitude;
     private String description;
+    private int minusCount;
+    private int plusCount;
+    private Integer currentVote;
 
     private String[] images;
     private Comment[] comments;
@@ -48,6 +51,30 @@ public class Request implements Serializable {
 
     public void setDescription(String description) {
         this.description = description;
+    }
+
+    public int getMinusCount() {
+        return minusCount;
+    }
+
+    public void setMinusCount(int minusCount) {
+        this.minusCount = minusCount;
+    }
+
+    public int getPlusCount() {
+        return plusCount;
+    }
+
+    public void setPlusCount(int plusCount) {
+        this.plusCount = plusCount;
+    }
+
+    public Integer getCurrentVote() {
+        return currentVote;
+    }
+
+    public void setCurrentVote(Integer currentVote) {
+        this.currentVote = currentVote;
     }
 
     public String[] getImages() {

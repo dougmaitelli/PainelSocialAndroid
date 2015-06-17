@@ -154,6 +154,14 @@ public class ViewRequestActivity extends AppCompatActivity {
 
             @Override
             public void onComplete() {
+                if (request.getCurrentVote() != null && request.getCurrentVote() == 1) {
+                    request.setPlusCount(request.getPlusCount() - 1);
+                }
+
+                request.setMinusCount(request.getMinusCount() + 1);
+
+                request.setCurrentVote(0);
+                refreshVote();
             }
         };
     }
@@ -172,6 +180,14 @@ public class ViewRequestActivity extends AppCompatActivity {
 
             @Override
             public void onComplete() {
+                if (request.getCurrentVote() != null && request.getCurrentVote() == 0) {
+                    request.setMinusCount(request.getMinusCount() - 1);
+                }
+
+                request.setPlusCount(request.getPlusCount() + 1);
+
+                request.setCurrentVote(1);
+                refreshVote();
             }
         };
     }
@@ -205,6 +221,21 @@ public class ViewRequestActivity extends AppCompatActivity {
         comments.addView(commentView);
     }
 
+    public void refreshVote() {
+        minusButton.setText("- " + request.getMinusCount());
+        plusButton.setText("+ " + request.getPlusCount());
+
+        if (request.getCurrentVote() != null) {
+            if (request.getCurrentVote() == 0) {
+                minusButton.setEnabled(false);
+                plusButton.setEnabled(true);
+            } else {
+                minusButton.setEnabled(true);
+                plusButton.setEnabled(false);
+            }
+        }
+    }
+
     private void loadRequest(final String _id) {
         new LoaderTask<ViewRequestActivity>(this, true) {
 
@@ -223,6 +254,8 @@ public class ViewRequestActivity extends AppCompatActivity {
                     requestLocation = new LatLng(request.getLatitude(), request.getLongitude());
 
                     textDescription.setText(request.getDescription());
+
+                    refreshVote();
 
                     for (String image : request.getImages()) {
                         if (image == null) {
