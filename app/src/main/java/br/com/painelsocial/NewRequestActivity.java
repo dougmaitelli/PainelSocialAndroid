@@ -17,6 +17,7 @@ import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
@@ -259,6 +260,11 @@ public class NewRequestActivity extends AppCompatActivity {
 
     private void createRequest() {
         final String description = inputDescription.getText().toString();
+
+        if (description.isEmpty()) {
+            Toast.makeText(this, "Favor preencher a descricao!", Toast.LENGTH_LONG).show();
+            return;
+        }
 
         new LoaderTask<NewRequestActivity>(this, true) {
 

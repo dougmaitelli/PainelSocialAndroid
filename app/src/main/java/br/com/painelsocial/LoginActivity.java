@@ -8,6 +8,7 @@ import android.support.v7.app.AlertDialog;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.Toast;
 
 import br.com.painelsocial.ws.Ws;
 
@@ -38,6 +39,11 @@ public class LoginActivity extends Activity {
     private void login() {
         final String email = inputEmail.getText().toString();
         final String password = inputPassword.getText().toString();
+
+        if (email.isEmpty() || password.isEmpty()) {
+            Toast.makeText(this, "Favor preencher todos os campos!", Toast.LENGTH_LONG).show();
+            return;
+        }
 
         new LoaderTask<LoginActivity>(this, true) {
 
@@ -79,6 +85,8 @@ public class LoginActivity extends Activity {
                                     if (token != null) {
                                         Config.getInstance().setToken(token);
                                         startActivity(new Intent(getContext(), MainActivity.class));
+                                    } else {
+                                        Toast.makeText(getContext(), "Email ja cadastrado!", Toast.LENGTH_LONG).show();
                                     }
                                 }
                             };
