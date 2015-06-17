@@ -60,15 +60,18 @@
         <activity
             android:name=".LoginActivity"
             android:label="@string/title_activity_login"
+            android:screenOrientation="portrait"
             android:noHistory="true" android:excludeFromRecents="true" >
         </activity>
         <activity
             android:name=".NewRequestActivity"
-            android:label="@string/title_activity_new_request" >
+            android:label="@string/title_activity_new_request"
+            android:screenOrientation="portrait" >
         </activity>
         <activity
             android:name=".ViewRequestActivity"
-            android:label="@string/title_activity_view_request" >
+            android:label="@string/title_activity_view_request"
+            android:screenOrientation="portrait" >
         </activity>
     </application>
 
